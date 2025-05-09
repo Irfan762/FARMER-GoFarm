@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoFarm - Farm Fresh Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-green': '#2E7D32',
+                        'brand-light': '#E8F5E9',
+                        'brand-accent': '#FFC107',
+                    }
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("search");
+            const categories = document.querySelectorAll(".category-item");
+
+            // Search functionality
+            searchInput.addEventListener("input", function () {
+                const filter = searchInput.value.toLowerCase();
+                
+                if (filter === '') {
+                    categories.forEach(category => {
+                        category.style.display = "flex";
+                        category.classList.remove("animate-pulse");
+                    });
+                    return;
+                }
+                
+                categories.forEach(category => {
+                    const text = category.innerText.toLowerCase();
+                    if (text.includes(filter)) {
+                        category.style.display = "flex";
+                        category.classList.add("animate-pulse");
+                        setTimeout(() => {
+                            category.classList.remove("animate-pulse");
+                        }, 1000);
+                    } else {
+                        category.style.display = "none";
+                    }
+                });
+            });
+
+            // Handle banner carousel
+            let currentBanner = 0;
+            const banners = document.querySelectorAll('.banner');
+            const totalBanners = banners.length;
+            const dots = document.querySelectorAll('.dot');
+
+            function showBanner(index) {
+                banners.forEach((banner, i) => {
+                    banner.classList.add('hidden');
+                    dots[i].classList.remove('bg-brand-green');
+                    dots[i].classList.add('bg-gray-300');
+                });
+                
+                banners[index].classList.remove('hidden');
+                dots[index].classList.remove('bg-gray-300');
+                dots[index].classList.add('bg-brand-green');
+            }
+
+            function nextBanner() {
+                currentBanner = (currentBanner + 1) % totalBanners;
+                showBanner(currentBanner);
+            }
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentBanner = index;
+                    showBanner(currentBanner);
+                });
+            });
+
+            // Auto-rotate banners
+            setInterval(nextBanner, 5000);
+            
+            // Initialize
+            showBanner(currentBanner);
+        });
+    </script>
+</head>
+<body class="bg-brand-light min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-green-600 to-green-700 text-white sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto p-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-leaf text-2xl text-brand-accent"></i>
+                    <h1 class="text-3xl font-bold">
+                        <span class="text-white">Go</span><span class="text-brand-accent">Farm</span>
+                    </h1>
+                </div>
+                
+                <div class="relative w-2/3">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <input id="search" type="text" placeholder="Search products, categories..." 
+                        class="pl-10 pr-4 py-2 w-full rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-accent transition">
+                </div>
+                
+                <button class="bg-brand-accent hover:bg-yellow-500 transition p-2 rounded-full">
+                    <i class="fas fa-shopping-cart text-white"></i>
+                </button>
+            </div>
+            
+            <div class="flex justify-between mt-3 items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-globe text-sm"></i>
+                    <select class="bg-green-500 text-white px-2 py-1 rounded cursor-pointer text-sm hover:bg-green-400 transition">
+                        <option>English</option>
+                        <option>मराठी</option>
+                        <option>हिंदी</option>
+                    </select>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <span class="cursor-pointer hover:text-brand-accent transition"><i class="fas fa-bell"></i></span>
+                    <span class="cursor-pointer hover:text-brand-accent transition"><i class="fas fa-cog"></i></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+        
+        <!-- Promotional Banners -->
+        <section class="mb-8 relative">
+            <div class="banner rounded-2xl overflow-hidden shadow-lg">
+                <div class="bg-gradient-to-r from-green-500 to-green-700 p-6 relative">
+                    <div class="absolute top-0 right-0 w-1/3 h-full opacity-20">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#FFFFFF" d="M35.6,-59.1C46.3,-52.8,55.1,-44,61.6,-33C68.1,-22,72.3,-11,71.8,-0.3C71.3,10.4,66.1,20.9,59.3,29.8C52.4,38.7,44,46.2,34.2,52.5C24.5,58.8,12.2,64,0.7,62.8C-10.8,61.7,-21.6,54.1,-33.1,47.6C-44.6,41.2,-56.8,35.8,-64.2,26.2C-71.7,16.6,-74.5,3,-72.3,-9.7C-70.1,-22.4,-63,-34.2,-52.9,-41.4C-42.8,-48.6,-29.9,-51.2,-18.5,-57.2C-7.1,-63.2,2.8,-72.5,13.3,-72.5C23.9,-72.5,34.8,-63.2,45.8,-53.9C56.7,-44.6,67.7,-35.3,66.5,-25.8C65.2,-16.4,51.7,-6.7,48.1,3.4C44.5,13.5,50.7,24.2,47.9,30.7C45.1,37.2,33.2,39.7,23.4,45.6C13.6,51.5,5.9,60.9,-2.2,64.3C-10.3,67.7,-19.1,65,-27.1,60.1C-35.1,55.2,-42.4,48.1,-47.2,39.7C-52,31.2,-54.3,21.3,-59.6,10.8C-64.8,0.3,-73.1,-10.8,-73.3,-21.9C-73.6,-32.9,-65.8,-43.9,-55.6,-51.4C-45.3,-58.9,-32.6,-63,-20.8,-66.7C-9,-70.5,1.8,-73.9,12.2,-72.1C22.5,-70.2,32.3,-63.1,35.6,-59.1Z" transform="translate(100 100)" />
+                        </svg>
+                    </div>
+                    <div class="relative z-10 max-w-lg">
+                        <p class="text-brand-accent font-bold text-sm mb-2">SPECIAL OFFER</p>
+                        <h2 class="text-3xl font-bold text-white mb-2">Fresh Seasonal Vegetables</h2>
+                        <p class="text-white mb-4">Get up to 25% off on locally grown vegetables this week!</p>
+                        <button class="bg-white text-green-600 px-4 py-2 rounded-full font-medium hover:bg-brand-accent hover:text-white transition">Shop Now</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="banner rounded-2xl overflow-hidden shadow-lg hidden">
+                <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 p-6 relative">
+                    <div class="absolute top-0 right-0 w-1/3 h-full opacity-20">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#FFFFFF" d="M44.5,-76.3C59.1,-69.2,73.2,-59.6,81.8,-46.2C90.4,-32.8,93.7,-16.4,93.2,-0.3C92.8,15.8,88.5,31.7,79.7,44.7C70.9,57.7,57.5,67.9,43,74.8C28.5,81.7,14.2,85.3,-0.1,85.5C-14.4,85.6,-28.9,82.3,-41.9,75.5C-55,68.7,-66.7,58.5,-74.4,45.6C-82.1,32.7,-85.8,16.4,-86.3,-0.3C-86.8,-17,-84.1,-34,-75.8,-47.4C-67.5,-60.9,-53.6,-70.9,-39,-76.9C-24.4,-82.9,-9.1,-85,5.9,-84.4C20.9,-83.9,41.8,-80.7,51.5,-73C61.3,-65.3,59.9,-53.2,44.5,-76.3Z" transform="translate(100 100)" />
+                        </svg>
+                    </div>
+                    <div class="relative z-10 max-w-lg">
+                        <p class="text-green-800 font-bold text-sm mb-2">NEW ARRIVALS</p>
+                        <h2 class="text-3xl font-bold text-white mb-2">Organic Fruits Collection</h2>
+                        <p class="text-white mb-4">Freshly harvested organic fruits now available!</p>
+                        <button class="bg-white text-yellow-600 px-4 py-2 rounded-full font-medium hover:bg-green-800 hover:text-white transition">View Collection</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="banner rounded-2xl overflow-hidden shadow-lg hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-700 p-6 relative">
+                    <div class="absolute top-0 right-0 w-1/3 h-full opacity-20">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#FFFFFF" d="M45.3,-77.1C58.9,-69.5,70.1,-57.1,78.2,-42.9C86.4,-28.7,91.6,-12.9,91.5,2.9C91.5,18.8,86.2,34.6,77.2,48.1C68.2,61.6,55.5,72.6,41.3,79.4C27.1,86.2,11.3,88.8,-3.8,87.5C-18.9,86.1,-33.3,81,-46.6,73C-59.9,65,-72.1,54.2,-79.6,40.6C-87.1,27,-89.9,10.6,-88.8,-5.6C-87.7,-21.7,-82.7,-37.6,-73.5,-50.6C-64.3,-63.5,-50.9,-73.6,-36.7,-80.7C-22.5,-87.8,-7.5,-92,6.6,-89.6C20.7,-87.3,41.3,-78.4,45.3,-77.1Z" transform="translate(100 100)" />
+                        </svg>
+                    </div>
+                    <div class="relative z-10 max-w-lg">
+                        <p class="text-yellow-300 font-bold text-sm mb-2">JUST LAUNCHED</p>
+                        <h2 class="text-3xl font-bold text-white mb-2">Farm-to-Home Delivery</h2>
+                        <p class="text-white mb-4">Get fresh products delivered directly to your doorstep!</p>
+                        <button class="bg-white text-blue-600 px-4 py-2 rounded-full font-medium hover:bg-yellow-300 hover:text-blue-800 transition">Learn More</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dots navigation -->
+            <div class="flex justify-center mt-4 space-x-2">
+                <button class="dot w-3 h-3 rounded-full bg-brand-green"></button>
+                <button class="dot w-3 h-3 rounded-full bg-gray-300"></button>
+                <button class="dot w-3 h-3 rounded-full bg-gray-300"></button>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Categories</h2>
+                <a href="#" class="text-green-600 hover:text-green-800 flex items-center font-medium">
+                    View All <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <a href="http://localhost/farmer/afterclickanyfruteinnratler.php" class="transform transition duration-300 hover:scale-105">
+                    <div class="category-item bg-white rounded-xl shadow-md flex flex-col items-center p-4 overflow-hidden border-b-4 border-red-400">
+                        <div class="w-20 h-20 mb-3 rounded-full bg-red-100 flex items-center justify-center">
+                            <img src="./image/frute.jpeg" alt="Fruits" class="w-16 h-16 rounded-full object-cover">
+                        </div>
+                        <span class="text-gray-800 font-medium">Fruits</span>
+                        <span class="text-xs text-gray-500 mt-1">Fresh & Organic</span>
+                    </div>
+                </a>
+                
+                <a href="http://localhost/farmer/afterClickvegitale.php" class="transform transition duration-300 hover:scale-105">
+                    <div class="category-item bg-white rounded-xl shadow-md flex flex-col items-center p-4 overflow-hidden border-b-4 border-green-400">
+                        <div class="w-20 h-20 mb-3 rounded-full bg-green-100 flex items-center justify-center">
+                            <img src="./image/vegitable.jpeg" alt="Vegetables" class="w-16 h-16 rounded-full object-cover">
+                        </div>
+                        <span class="text-gray-800 font-medium">Vegetables</span>
+                        <span class="text-xs text-gray-500 mt-1">Farm Fresh</span>
+                    </div>
+                </a>
+                
+                <a href="http://localhost/farmer/foodwesthtml.php" class="transform transition duration-300 hover:scale-105">
+                    <div class="category-item bg-white rounded-xl shadow-md flex flex-col items-center p-4 overflow-hidden border-b-4 border-amber-400">
+                        <div class="w-20 h-20 mb-3 rounded-full bg-amber-100 flex items-center justify-center">
+                            <img src="./image/weast.jpg" alt="Waste" class="w-16 h-16 rounded-full object-cover">
+                        </div>
+                        <span class="text-gray-800 font-medium">Food Waste</span>
+                        <span class="text-xs text-gray-500 mt-1">Sustainable</span>
+                    </div>
+                </a>
+                
+                <div class="category-item bg-white rounded-xl shadow-md flex flex-col items-center p-4 overflow-hidden border-b-4 border-blue-400 transform transition duration-300 hover:scale-105">
+                    <div class="w-20 h-20 mb-3 rounded-full bg-blue-100 flex items-center justify-center">
+                        <img src="./image/dari.jpeg" alt="Dairy" class="w-16 h-16 rounded-full object-cover">
+                    </div>
+                    <span class="text-gray-800 font-medium">Dairy</span>
+                    <span class="text-xs text-gray-500 mt-1">Farm Fresh</span>
+                </div>
+                
+                <div class="category-item bg-white rounded-xl shadow-md flex flex-col items-center p-4 overflow-hidden border-b-4 border-yellow-400 transform transition duration-300 hover:scale-105">
+                    <div class="w-20 h-20 mb-3 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <img src="./image/sp.jpeg" alt="Spices" class="w-16 h-16 rounded-full object-cover">
+                    </div>
+                    <span class="text-gray-800 font-medium">Spices</span>
+                    <span class="text-xs text-gray-500 mt-1">Organic</span>
+                </div>
+                
+                <a href="./index.html" class="transform transition duration-300 hover:scale-105">
+                    <div class="category-item bg-white rounded-xl shadow-md flex flex-col items-center p-4 overflow-hidden border-b-4 border-purple-400">
+                        <div class="w-20 h-20 mb-3 rounded-full bg-purple-100 flex items-center justify-center">
+                            <img src="./image/market.jpeg" alt="Market" class="w-16 h-16 rounded-full object-cover">
+                        </div>
+                        <span class="text-gray-800 font-medium">Market</span>
+                        <span class="text-xs text-gray-500 mt-1">Shop All</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        
+        <!-- Featured Products Section (New) -->
+        <section class="mt-10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Featured Products</h2>
+                <a href="#" class="text-green-600 hover:text-green-800 flex items-center font-medium">
+                    View All <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:shadow-lg">
+                    <div class="relative">
+                        <img src="/api/placeholder/320/180" alt="Organic Apples" class="w-full h-32 object-cover">
+                        <div class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">Organic</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-800">Organic Apples</h3>
+                        <div class="text-yellow-500 text-sm mt-1">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-green-600 font-bold">₹120/kg</span>
+                            <button class="bg-green-500 hover:bg-green-600 text-white p-1 rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:shadow-lg">
+                    <div class="relative">
+                        <img src="/api/placeholder/320/180" alt="Fresh Tomatoes" class="w-full h-32 object-cover">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">Sale</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-800">Fresh Tomatoes</h3>
+                        <div class="text-yellow-500 text-sm mt-1">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-green-600 font-bold">₹80/kg</span>
+                            <button class="bg-green-500 hover:bg-green-600 text-white p-1 rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:shadow-lg">
+                    <div class="relative">
+                        <img src="/api/placeholder/320/180" alt="Farm Fresh Milk" class="w-full h-32 object-cover">
+                        <div class="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">New</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-800">Farm Fresh Milk</h3>
+                        <div class="text-yellow-500 text-sm mt-1">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-green-600 font-bold">₹60/L</span>
+                            <button class="bg-green-500 hover:bg-green-600 text-white p-1 rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:shadow-lg">
+                    <div class="relative">
+                        <img src="/api/placeholder/320/180" alt="Organic Turmeric" class="w-full h-32 object-cover">
+                        <div class="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">Best Seller</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-800">Organic Turmeric</h3>
+                        <div class="text-yellow-500 text-sm mt-1">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-green-600 font-bold">₹180/kg</span>
+                            <button class="bg-green-500 hover:bg-green-600 text-white p-1 rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- App Info Banner (New) -->
+    <section class="bg-gradient-to-r from-green-500 to-green-600 py-8 px-4 mb-16">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-1/2 mb-6 md:mb-0">
+                    <h2 class="text-white text-2xl font-bold mb-2">Download Our App</h2>
+                    <p class="text-green-100 mb-4">Get farm-fresh products at your fingertips. Order anytime, anywhere!</p>
+                    <div class="flex space-x-4">
+                        <button class="bg-black text-white px-4 py-2 rounded-lg flex items-center">
+                            <i class="fab fa-apple text-2xl mr-2"></i>
+                            <div class="text-left">
+                                <p class="text-xs">Download on the</p>
+                                <p class="font-bold">App Store</p>
+                            </div>
+                        </button>
+                        <button class="bg-black text-white px-4 py-2 rounded-lg flex items-center">
+                            <i class="fab fa-google-play text-2xl mr-2"></i>
+                            <div class="text-left">
+                                <p class="text-xs">Get it on</p>
+                                <p class="font-bold">Google Play</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/3">
+                    <img src="/api/placeholder/300/200" alt="App Screenshot" class="rounded-xl shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white shadow-lg border-t z-50">
+        <div class="flex justify-around py-2">
+            <a href="#" class="flex flex-col items-center text-green-600">
+                <div class="rounded-full bg-green-100 w-10 h-10 flex items-center justify-center mb-1">
+                    <i class="fas fa-home"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="post.html" class="flex flex-col items-center text-gray-500 hover:text-green-600 transition">
+                <div class="rounded-full bg-gray-100 w-10 h-10 flex items-center justify-center mb-1 hover:bg-green-100 transition">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span class="text-xs font-medium">Post</span>
+            </a>
+            <a href="Ratilerchat.html" class="flex flex-col items-center text-gray-500 hover:text-green-600 transition">
+                <div class="rounded-full bg-gray-100 w-10 h-10 flex items-center justify-center mb-1 hover:bg-green-100 transition">
+                    <i class="fas fa-comment-alt"></i>
+                </div>
+                <span class="text-xs font-medium">Chat</span>
+            </a>
+            <a href="ReatlaerAcc.html" class="flex flex-col items-center text-gray-500 hover:text-green-600 transition">
+                <div class="rounded-full bg-gray-100 w-10 h-10 flex items-center justify-center mb-1 hover:bg-green-100 transition">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="text-xs font-medium">Account</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Floating Action Button (new) -->
+    <div class="fixed right-6 bottom-20 z-50">
+        <button class="bg-green-600 hover:bg-green-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform transform hover:scale-110">
+            <i class="fas fa-shopping-basket text-xl"></i>
+        </button>
+    </div>
+
+   <style>
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .banner {
+            animation: fade-in 0.5s ease-out;
+        }
+        
+        .category-item:hover {
+            border-bottom-width: 6px;
+            margin-top: -2px;
+        }
+    </style>
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Commodity Price Predictor</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
+    <style>
+        body {
+            background-color: rgb(75, 167, 75);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .container {
+            width: 60%;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        
+        input {
+            width: 80%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: darkgreen;
+        }
+        
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Commodity Price Predictor</h1>
+        <label for="userInput">Enter Commodity Name:</label><br>
+        <input type="text" id="userInput" placeholder="e.g., Rice"><br>
+        
+        <label for="locationInput">Enter Location:</label><br>
+        <input type="text" id="locationInput" placeholder="e.g., Mumbai"><br>
+        
+        <button onclick="getUserLiveLocation()">Use My Location</button>
+        <button onclick="sendData()">Predict Price</button>
+        
+        <h2>Result:</h2>
+        <p id="currentPrice"></p>
+        
+        <div class="table-container">
+            <table id="resultTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Today</th>
+                        <th>In 3 days</th>
+                        <th>Next week</th>
+                        <th>Next 15 days</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="today"></td>
+                        <td id="in3days"></td>
+                        <td id="nextWeek"></td>
+                        <td id="next15days"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function getUserLiveLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(async function(position) {
+                    let lat = position.coords.latitude;
+                    let lng = position.coords.longitude;
+                    let geocoder = new google.maps.Geocoder();
+                    let latlng = { lat: lat, lng: lng };
+                    geocoder.geocode({ location: latlng }, function(results, status) {
+                        if (status === 'OK') {
+                            if (results[0]) {
+                                document.getElementById("locationInput").value = results[0].formatted_address;
+                            } else {
+                                alert("No location found");
+                            }
+                        } else {
+                            alert("Geocoder failed due to: " + status);
+                        }
+                    });
+                }, function(error) {
+                    alert("Geolocation error: " + error.message);
+                }, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 5000
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        async function sendData() {
+            let inputData = document.getElementById("userInput").value;
+            let locationData = document.getElementById("locationInput").value;
+
+            if (!inputData.trim() || !locationData.trim()) {
+                alert("Please enter both commodity and location!");
+                return;
+            }
+
+            let response = await fetch("http://127.0.0.1:8000/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "commodity": inputData,
+                    "location": locationData
+                })
+            });
+
+            if (!response.ok) {
+                document.getElementById("currentPrice").innerText = "Error: " + response.statusText;
+                document.getElementById("resultTable").style.display = "none";
+                return;
+            }
+
+            let result = await response.json();
+            if (result.error) {
+                document.getElementById("currentPrice").innerText = "Error: " + result.error;
+                document.getElementById("resultTable").style.display = "none";
+            } else {
+                document.getElementById("currentPrice").innerText = `Current Price: ${result.current_price}`;
+                document.getElementById("today").innerText = result.forecast["Today"];
+                document.getElementById("in3days").innerText = result.forecast["In 3 days"];
+                document.getElementById("nextWeek").innerText = result.forecast["Next week"];
+                document.getElementById("next15days").innerText = result.forecast["Next 15 days"];
+                document.getElementById("resultTable").style.display = "table";
+            }
+        }
+    </script>
+</body>
+
+</html>
